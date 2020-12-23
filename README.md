@@ -2,6 +2,9 @@
 
 For now only tested on Android. For iOS is have to change the storage handling.
 
+#TODO
+Add Connection hadnling.(What happens if no internet connection)
+
 
 # Why i created this project
 
