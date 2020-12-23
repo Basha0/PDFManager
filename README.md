@@ -2,7 +2,8 @@
 
 For now only tested on Android. For iOS is have to change the storage handling.
 
-#TODO
+# TODO
+
 Add Connection hadnling.(What happens if no internet connection)
 
 
