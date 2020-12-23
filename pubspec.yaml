@@ -23,6 +23,18 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  connectivity: ^2.0.2
+  hive: ^1.4.4+1
+  hive_flutter: ^0.3.1
+  path_provider: ^1.6.24
+  get: ^3.23.1 
+  auto_size_text: ^2.1.0
+  permission_handler: ^5.0.1+1
+  image_picker: ^0.6.7+17
+  bmprogresshud: ^0.0.10
+  flutter_pdfview: ^1.0.4
+  ext_storage: ^1.0.3
+  url_launcher: ^5.7.10
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -32,6 +44,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  hive_generator: ^0.8.2
+  build_runner: ^1.10.11
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -43,10 +57,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
-  # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
