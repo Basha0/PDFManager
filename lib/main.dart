@@ -1,66 +1,27 @@
+import 'package:bmprogresshud/bmprogresshud.dart';
 import 'package:flutter/material.dart';
+import 'package:pdfmanager/database/hive_service.dart';
+import 'package:pdfmanager/screens/library_screen/library_screen.dart';
 
-void main() {
-  runApp(MyApp());
-}
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  HiveService _hiveService = HiveService.getInstance();
+  await _hiveService.init();
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
+  runApp(ProgressHud(
+    isGlobalHud: true,
+    child: MaterialApp(
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        brightness: Brightness.dark,
+        primaryColor: Colors.grey[900],
+        fontFamily: 'Arial Black',
+        textTheme: TextTheme(
+            headline1: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Arial Black')),
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ),
-    );
-  }
+      home: LibraryScreen(),
+    ),
+  ));
 }
