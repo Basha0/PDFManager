@@ -1,44 +1,41 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'chapter.dart';
+part of 'folder.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class ChapterAdapter extends TypeAdapter<Chapter> {
+class FolderAdapter extends TypeAdapter<Folder> {
   @override
-  final int typeId = 1;
+  final int typeId = 0;
 
   @override
-  Chapter read(BinaryReader reader) {
+  Folder read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Chapter(
-      timeStamp: fields[0] as String,
-      fileName: fields[1] as String,
-      fileUrl: fields[2] as String,
-      completed: fields[3] as bool,
-      currentPage: fields[4] as int,
+    return Folder(
+      name: fields[0] as String,
+      timeStamp: fields[1] as String,
+      imageStr: fields[2] as String,
+      files: (fields[3] as List)?.cast<CustomFile>(),
     );
   }
 
   @override
-  void write(BinaryWriter writer, Chapter obj) {
+  void write(BinaryWriter writer, Folder obj) {
     writer
-      ..writeByte(5)
-      ..writeByte(0)
-      ..write(obj.timeStamp)
-      ..writeByte(1)
-      ..write(obj.fileName)
-      ..writeByte(2)
-      ..write(obj.fileUrl)
-      ..writeByte(3)
-      ..write(obj.completed)
       ..writeByte(4)
-      ..write(obj.currentPage);
+      ..writeByte(0)
+      ..write(obj.name)
+      ..writeByte(1)
+      ..write(obj.timeStamp)
+      ..writeByte(2)
+      ..write(obj.imageStr)
+      ..writeByte(3)
+      ..write(obj.files);
   }
 
   @override
@@ -47,7 +44,7 @@ class ChapterAdapter extends TypeAdapter<Chapter> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ChapterAdapter &&
+      other is FolderAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

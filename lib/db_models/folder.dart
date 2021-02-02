@@ -1,10 +1,10 @@
 import 'package:hive/hive.dart';
-import 'package:pdfmanager/db_models/chapter.dart';
+import 'package:pdfmanager/db_models/file.dart';
 
-part 'book.g.dart';
+part 'folder.g.dart';
 
 @HiveType(typeId: 0)
-class Book {
+class Folder {
   @HiveField(0)
   String name;
 
@@ -15,7 +15,7 @@ class Book {
   String imageStr;
 
   @HiveField(3)
-  List<Chapter> files;
+  List<CustomFile> files;
 
-  Book({this.name, this.timeStamp, this.imageStr, this.files});
+  Folder({this.name, this.timeStamp, this.imageStr, this.files});
 }

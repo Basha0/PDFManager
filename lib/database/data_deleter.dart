@@ -1,31 +1,45 @@
 import 'package:pdfmanager/database/boxes.dart';
 import 'package:pdfmanager/database/hive_service.dart';
-import 'package:pdfmanager/db_models/book.dart';
-import 'package:pdfmanager/db_models/chapter.dart';
+import 'package:pdfmanager/db_models/folder.dart';
+import 'package:pdfmanager/db_models/file.dart';
 
 abstract class DataDeletingLogic {
-  Future deleteBook(String bookId);
-  Future deleteChapter(String bookId,  String chapterUrl);
+  Future deleteFolder(String folderId);
+  Future deleteFile(String folderId, String fileUrl);
+  Future deleteAllFolderFiles(String folderId);
 }
 
 class DataDeleter implements DataDeletingLogic {
   HiveService _hiveService = HiveService.getInstance();
 
   @override
-  Future deleteBook(String bookId) async {
-    final bookBox = await _hiveService.open(Boxes.bookBox);
-    await bookBox.delete(bookId);
+  Future deleteFolder(String folderId) async {
+    final folderBox = await _hiveService.open(Boxes.folderBox);
+    await folderBox.delete(folderId);
     return null;
   }
 
   @override
-  Future deleteChapter(String bookId, String chapterUrl) async {
-    final bookBox = await _hiveService.open(Boxes.bookBox);
-    Book existingBook = bookBox.get(bookId);
-    Chapter chapterToDelete =
-        existingBook.files.firstWhere((chap) => chap.fileUrl == chapterUrl);
-    existingBook.files.remove(chapterToDelete);
-    bookBox.put(bookId, existingBook);
+  Future deleteFile(String folderId, String fileUrl) async {
+    final folderBox = await _hiveService.open(Boxes.folderBox);
+    Folder existingFolder = folderBox.get(folderId);
+    CustomFile fileToDelete =
+        existingFolder.files.firstWhere((chap) => chap.fileUrl == fileUrl);
+    existingFolder.files.remove(fileToDelete);
+    folderBox.put(folderId, existingFolder);
+    return null;
+  }
+
+  @override
+  Future deleteAllFolderFiles(String folderId) async {
+    final folderBox = await _hiveService.open(Boxes.folderBox);
+    Folder existingFolder = folderBox.get(folderId);
+    var files = existingFolder.files;
+
+    files.forEach((file) {
+      existingFolder.files.firstWhere((fl) => fl.fileUrl == file.fileUrl);
+    });
+    folderBox.put(folderId, existingFolder);
     return null;
   }
 }

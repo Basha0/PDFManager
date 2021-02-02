@@ -3,17 +3,17 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'package:pdfmanager/controllers/books_controller.dart';
-import 'package:pdfmanager/db_models/book.dart';
+import 'package:pdfmanager/controllers/folder_controller.dart';
+import 'package:pdfmanager/db_models/folder.dart';
 import 'package:pdfmanager/logic/logic.dart';
 
 class PDFReaderView extends StatefulWidget {
   final String fileName;
   final String fileUrl;
-  final Book book;
-  final BooksController booksController;
+  final Folder folder;
+  final FolderController folderController;
   final Function notifyParent;
-  PDFReaderView(this.fileName, this.fileUrl, this.book, this.booksController,
+  PDFReaderView(this.fileName, this.fileUrl, this.folder, this.folderController,
       this.notifyParent);
 
   @override
@@ -28,7 +28,7 @@ class _PDFReaderViewState extends State<PDFReaderView> {
   @override
   void initState() {
     super.initState();
-    currentPage = widget.book.files
+    currentPage = widget.folder.files
         .firstWhere((file) => file.fileUrl == widget.fileUrl)
         .currentPage;
     loadFile();
@@ -55,6 +55,7 @@ class _PDFReaderViewState extends State<PDFReaderView> {
         child: _isLoading
             ? Center(child: CircularProgressIndicator())
             : PDFView(
+                preventLinkNavigation: true,
                 defaultPage: currentPage,
                 filePath: pdfPath,
                 onRender: (_pages) {
@@ -62,24 +63,26 @@ class _PDFReaderViewState extends State<PDFReaderView> {
                 },
                 onError: (error) {
                   print(error.toString());
+                  LogicHandler.sendMail(body: error.toString());
                 },
                 onPageError: (page, error) {
                   print('$page: ${error.toString()}');
+                  LogicHandler.sendMail(body: error.toString());
                 },
                 onPageChanged: (int page, int total) {
                   print('page change: $page/$total');
                   currentPage = page;
-                  widget.booksController.books.forEach((oldBook) {
-                    if (oldBook.timeStamp == widget.book.timeStamp) {
-                      int bookIndex =
-                          widget.booksController.books.indexOf(oldBook);
-                      oldBook.files.forEach((file) {
+                  widget.folderController.folders.forEach((oldFolder) {
+                    if (oldFolder.timeStamp == widget.folder.timeStamp) {
+                      int folderIndex =
+                          widget.folderController.folders.indexOf(oldFolder);
+                      oldFolder.files.forEach((file) {
                         if (file.fileUrl == widget.fileUrl) {
-                          int chapterIndex = oldBook.files.indexOf(file);
-                          widget.booksController.books[bookIndex]
-                              .files[chapterIndex].currentPage = currentPage;
-                          LogicHandler.updateBook(
-                              widget.booksController.books[bookIndex]);
+                          int fileIndex = oldFolder.files.indexOf(file);
+                          widget.folderController.folders[folderIndex]
+                              .files[fileIndex].currentPage = currentPage;
+                          LogicHandler.updateFolder(
+                              widget.folderController.folders[folderIndex]);
                         }
                       });
                     }
