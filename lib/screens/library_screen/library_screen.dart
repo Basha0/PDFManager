@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pdfmanager/controllers/books_controller.dart';
+import 'package:pdfmanager/controllers/folder_controller.dart';
 import 'package:pdfmanager/logic/logic.dart';
-import 'package:pdfmanager/screens/chapterview/chapter_view.dart';
+import 'package:pdfmanager/screens/files_list_view/file_view.dart';
 
 class LibraryScreen extends StatelessWidget {
-  final bookController = Get.put(BooksController());
+  final folderController = Get.put(FolderController());
   String _folderName;
   String _imageStr;
 
@@ -23,10 +23,10 @@ class LibraryScreen extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(20),
-            child: GetX<BooksController>(
+            child: GetX<FolderController>(
               builder: (controller) {
                 return GridView.builder(
-                  itemCount: controller.books.length,
+                  itemCount: controller.folders.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 5,
                     childAspectRatio: MediaQuery.of(context).size.width / 800,
@@ -34,9 +34,9 @@ class LibraryScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     var _byteImage;
                     bool imageAvaible = false;
-                    if (bookController.books[index].imageStr != null) {
-                      String base64Image = bookController.books[index].imageStr;
-                      print(bookController.books[index].imageStr);
+                    if (folderController.folders[index].imageStr != null) {
+                      String base64Image = folderController.folders[index].imageStr;
+                      print(folderController.folders[index].imageStr);
                       _byteImage = Base64Decoder().convert(base64Image);
                       imageAvaible = true;
                     }
@@ -45,8 +45,8 @@ class LibraryScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ChapterScreen(
-                                bookController.books[index], bookController),
+                            builder: (context) => FilesScreen(
+                                folderController.folders[index], folderController),
                           ),
                         );
                       },
@@ -83,7 +83,7 @@ class LibraryScreen extends StatelessWidget {
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
                                 child: AutoSizeText(
-                                  controller.books[index].name ?? "Error",
+                                  controller.folders[index].name ?? "Error",
                                   maxLines: 2,
                                   minFontSize: 11,
                                   maxFontSize: 20,
@@ -122,7 +122,7 @@ class LibraryScreen extends StatelessWidget {
                           child: Container(
                             height: 300,
                             width: MediaQuery.of(context).size.width - 100,
-                            child: addBookWidget(context),
+                            child: addFolderWidget(context),
                           ),
                         );
                       },
@@ -137,7 +137,7 @@ class LibraryScreen extends StatelessWidget {
     );
   }
 
-  addBookWidget(BuildContext context) {
+  addFolderWidget(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
@@ -204,8 +204,8 @@ class LibraryScreen extends StatelessWidget {
                     ),
                     onPressed: () {
                       if (_folderName != null && _folderName.isNotEmpty) {
-                        LogicHandler.addBook(
-                            _folderName, _imageStr, bookController);
+                        LogicHandler.addFolder(
+                            _folderName, _imageStr, folderController);
                         Navigator.pop(context);
                       } else {
                         showDialog(

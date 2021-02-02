@@ -34,7 +34,7 @@ dependencies:
   bmprogresshud: ^0.0.10
   flutter_pdfview: ^1.0.4
   ext_storage: ^1.0.3
-  url_launcher: ^5.7.10
+  flutter_email_sender: ^4.0.0
 
 
   # The following adds the Cupertino Icons font to your application.

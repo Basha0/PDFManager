@@ -1,21 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pdfmanager/controllers/books_controller.dart';
-import 'package:pdfmanager/db_models/book.dart';
+import 'package:pdfmanager/controllers/folder_controller.dart';
+import 'package:pdfmanager/db_models/folder.dart';
+import 'package:pdfmanager/logic/dialog.dart';
 import 'package:pdfmanager/logic/logic.dart';
 
-class AddChapterDialoge extends StatefulWidget {
-  final Book book;
-  final BooksController bookController;
+class AddFileDialoge extends StatefulWidget {
+  final Folder folder;
+  final FolderController folderController;
   final Function() notifyParent;
-  AddChapterDialoge(this.book, this.bookController, this.notifyParent);
+  AddFileDialoge(this.folder, this.folderController, this.notifyParent);
 
   @override
-  _AddChapterDialogeState createState() => new _AddChapterDialogeState();
+  _AddFileDialogeState createState() => new _AddFileDialogeState();
 }
 
-class _AddChapterDialogeState extends State<AddChapterDialoge> {
-  String _chapterURL;
+class _AddFileDialogeState extends State<AddFileDialoge> {
+  static CustomDiaglog _customDialog = CustomDiaglog.getInstance();
+  String _fileURL;
   String _fileName;
   bool _isGoogleDrive = false;
   String googleDriveUrlExample =
@@ -39,13 +41,15 @@ class _AddChapterDialogeState extends State<AddChapterDialoge> {
               TextField(
                 cursorColor: Colors.red,
                 onChanged: (url) {
-                  _chapterURL = url;
+                  _fileURL = url;
                 },
                 decoration: new InputDecoration(
                   focusedBorder: OutlineInputBorder(
                     borderSide: const BorderSide(color: Colors.red, width: 2.0),
                   ),
-                  hintText:_isGoogleDrive ? googleDriveUrlExample : "Example: https://MyWebsite.com/file.pdf",
+                  hintText: _isGoogleDrive
+                      ? googleDriveUrlExample
+                      : "Example: https://MyWebsite.com/file.pdf",
                   hintStyle: TextStyle(fontSize: 8),
                   labelStyle: new TextStyle(color: Colors.white),
                   labelText: 'Url',
@@ -103,35 +107,10 @@ class _AddChapterDialogeState extends State<AddChapterDialoge> {
                     ),
                     onPressed: () {
                       if (_fileName != null && _fileName.isNotEmpty) {
-                        LogicHandler.downloadFile(
-                                widget.book,
-                                widget.bookController,
-                                _chapterURL,
-                                _fileName,
-                                _isGoogleDrive)
-                            .then((value) {
-                          if (value) {
-                            widget.notifyParent();
-                          }
-                        });
-
-                        Navigator.pop(context);
+                        downloadFile(context);
                       } else {
-                        showDialog(
-                          context: context,
-                          builder: (con) => AlertDialog(
-                            title: Text("File Name Empty"),
-                            content: Text("Please add a file name."),
-                            actions: [
-                              FlatButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text("Ok"),
-                              ),
-                            ],
-                          ),
-                        );
+                        _customDialog.showOkDialoge(context, "File Name Empty",
+                            "Please add a file name.");
                       }
                     },
                   ),
@@ -142,5 +121,25 @@ class _AddChapterDialogeState extends State<AddChapterDialoge> {
         ],
       ),
     );
+  }
+
+  downloadFile(BuildContext context) async {
+    var permissionGranted = await LogicHandler.checkStoragePermissions();
+    if (permissionGranted) {
+      bool success = await LogicHandler.downloadFile(
+          widget.folder,
+          widget.folderController,
+          _fileURL,
+          _fileName,
+          _isGoogleDrive,
+          context);
+      if (success) {
+        widget.notifyParent();
+        Navigator.pop(context);
+      }
+    } else {
+      _customDialog.showOkDialoge(context, "Permission Error",
+          "In order to add a Picture, storage permissions is needed.");
+    }
   }
 }

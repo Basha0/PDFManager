@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart' as path;
-import 'package:pdfmanager/db_models/chapter.dart';
-import 'package:pdfmanager/db_models/book.dart';
+import 'package:pdfmanager/db_models/file.dart';
+import 'package:pdfmanager/db_models/folder.dart';
 
 class HiveService {
   static final HiveService _singleton = new HiveService._internal();
@@ -29,7 +29,7 @@ class HiveService {
   }
 
   registerAdapter() {
-    Hive.registerAdapter(BookAdapter());
-    Hive.registerAdapter(ChapterAdapter());
+    Hive.registerAdapter(FolderAdapter());
+    Hive.registerAdapter(CustomFileAdapter());
   }
 }

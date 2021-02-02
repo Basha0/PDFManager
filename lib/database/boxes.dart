@@ -1,4 +1,4 @@
 class Boxes {
-  static final String bookBox = "books";
-  static final String chapterBox = "chapters";
+  static final String folderBox = "folders";
+  static final String fileBox = "files";
 }

@@ -2,23 +2,24 @@ import 'package:pdfmanager/database/data_creator.dart';
 import 'package:pdfmanager/database/data_deleter.dart';
 import 'package:pdfmanager/database/data_fetcher.dart';
 import 'package:pdfmanager/database/data_updater.dart';
-import 'package:pdfmanager/db_models/book.dart';
-import 'package:pdfmanager/db_models/chapter.dart';
+import 'package:pdfmanager/db_models/folder.dart';
+import 'package:pdfmanager/db_models/file.dart';
 
 abstract class HiveDatabaseLogic {
   //Fetch
-  Future<List<Book>> getAllBooks();
+  Future<List<Folder>> getAllFolders();
 
   //Create
-  Future addBook(Book book);
-  Future addChapter(Book book, Chapter chapter);
+  Future addFolder(Folder folder);
+  Future addFile(Folder folder, CustomFile file);
 
   //Update
-  Future updateBook(Book book);
+  Future updateFolder(Folder folder);
 
   //Delete
-  Future deleteBook(String bookId);
-  Future deleteChapter(String bookId, String chapterUrl);
+  Future deleteFolder(String folderId);
+  Future deleteFile(String folderId, String fileUrl);
+  Future deleteAllFolderFiles(String folderId);
 }
 
 class HiveDatabase implements HiveDatabaseLogic {
@@ -33,35 +34,40 @@ class HiveDatabase implements HiveDatabaseLogic {
 
   // Fetch
   @override
-  Future<List<Book>> getAllBooks() async {
-    return _dataFetcher.getAllBooks();
+  Future<List<Folder>> getAllFolders() async {
+    return _dataFetcher.getAllFolders();
   }
 
   //Create
   @override
-  Future addBook(Book book) async {
-    return _dataCreator.addBook(book);
+  Future addFolder(Folder folder) async {
+    return _dataCreator.addFolder(folder);
   }
 
   @override
-  Future addChapter(Book book, Chapter chapter) async {
-    return _dataCreator.addChapter(book, chapter);
+  Future addFile(Folder folder, CustomFile file) async {
+    return _dataCreator.addFile(folder, file);
   }
 
   //Update
   @override
-  Future updateBook(Book book) async {
-    return _dataUpdater.updateBook(book);
+  Future updateFolder(Folder folder) async {
+    return _dataUpdater.updateFolder(folder);
   }
 
   // Delete
   @override
-  Future deleteBook(String bookId) async {
-    return _dataDeleter.deleteBook(bookId);
+  Future deleteFolder(String folderId) async {
+    return _dataDeleter.deleteFolder(folderId);
   }
 
   @override
-  Future deleteChapter(String bookId, String chapterUrl) async {
-    return _dataDeleter.deleteChapter(bookId, chapterUrl);
+  Future deleteFile(String folderId, String fileUrl) async {
+    return _dataDeleter.deleteFile(folderId, fileUrl);
+  }
+
+  @override
+  Future deleteAllFolderFiles(String folderId) async {
+    return _dataDeleter.deleteAllFolderFiles(folderId);
   }
 }

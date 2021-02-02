@@ -1,9 +1,9 @@
 import 'package:hive/hive.dart';
 
-part 'chapter.g.dart';
+part 'file.g.dart';
 
 @HiveType(typeId: 1)
-class Chapter {
+class CustomFile {
 
   @HiveField(0)
   String timeStamp;
@@ -20,11 +20,15 @@ class Chapter {
   @HiveField(4)
   int currentPage;
 
-  Chapter(
+  @HiveField(5)
+  String filePath;
+
+  CustomFile(
       {
       this.timeStamp,
       this.fileName,
       this.fileUrl,
       this.completed,
-      this.currentPage});
+      this.currentPage,
+      this.filePath});
 }

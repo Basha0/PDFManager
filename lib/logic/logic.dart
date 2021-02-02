@@ -3,44 +3,45 @@ import 'dart:io' as io;
 import 'dart:typed_data';
 
 import 'package:ext_storage/ext_storage.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:http/http.dart' as http;
 import 'package:bmprogresshud/bmprogresshud.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:pdfmanager/controllers/books_controller.dart';
+import 'package:pdfmanager/controllers/folder_controller.dart';
 import 'package:pdfmanager/database/hive_database_service.dart';
-import 'package:pdfmanager/db_models/book.dart';
-import 'package:pdfmanager/db_models/chapter.dart';
-import 'package:pdfmanager/screens/chapterview/chapter_view.dart';
+import 'package:pdfmanager/db_models/folder.dart';
+import 'package:pdfmanager/db_models/file.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:url_launcher/url_launcher.dart';
+
+import 'dialog.dart';
 
 class LogicHandler {
   static HiveDatabase _hiveDatabase = HiveDatabase.getInstance();
+  static CustomDiaglog _customDialog = CustomDiaglog.getInstance();
 
-  static void addBook(String folderName, String imageString,
-      BooksController bookController) async {
-    List<Chapter> chapterList = new List<Chapter>();
+  static void addFolder(String folderName, String imageString,
+      FolderController folderController) async {
+    List<CustomFile> fileList = new List<CustomFile>();
     String timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
-    Book newBook = new Book(
+    Folder newFolder = new Folder(
         name: folderName,
         imageStr: imageString,
         timeStamp: timeStamp,
-        files: chapterList);
+        files: fileList);
 
-    bookController.books.add(newBook);
-    await _hiveDatabase.addBook(newBook);
+    folderController.folders.add(newFolder);
+    await _hiveDatabase.addFolder(newFolder);
   }
 
-  static updateBook(Book book) async {
-    await _hiveDatabase.updateBook(book);
+  static updateFolder(Folder folder) async {
+    await _hiveDatabase.updateFolder(folder);
   }
 
-  static deleteFile(Book book, String fileUrl, String fileName,
-      BooksController booksController) async {
-    deleteChapter(book.timeStamp, fileUrl, booksController);
+  static deleteFolderFile(Folder folder, String fileUrl, String fileName,
+      FolderController folderController) async {
+    deleteFile(folder.timeStamp, fileUrl, folderController);
 
     try {
       io.File file = await getFilePath(fileName);
@@ -55,15 +56,40 @@ class LogicHandler {
     }
   }
 
-  static void deleteChapter(String timeStamp, String chapterUrl,
-      BooksController bookController) async {
-    await _hiveDatabase.deleteChapter(timeStamp, chapterUrl);
-    bookController.books.forEach((oldBook) {
-      if (oldBook.timeStamp == timeStamp) {
-        int bookIndex = bookController.books.indexOf(oldBook);
-        oldBook.files.forEach((file) {
-          if (file.fileUrl == chapterUrl) {
-            bookController.books[bookIndex].files.remove(file);
+  static deleteAllFilesInFolder(
+      String folderId, FolderController folderController) async {
+    await _hiveDatabase.deleteAllFolderFiles(folderId);
+    folderController.folders.forEach((oldFolder) {
+      if (oldFolder.timeStamp == folderId) {
+        var files = oldFolder.files;
+
+        files.forEach((f) async {
+          try {
+            io.File file = await getFilePath(f.fileName);
+
+            if (await file.exists()) {
+              await file.delete();
+            } else {
+              print("file doesn't exist.");
+            }
+          } catch (e) {
+            print(e.toString());
+          }
+        });
+        oldFolder.files.removeWhere((file) => files.contains(file));
+      }
+    });
+  }
+
+  static void deleteFile(String timeStamp, String fileUrl,
+      FolderController folderController) async {
+    await _hiveDatabase.deleteFile(timeStamp, fileUrl);
+    folderController.folders.forEach((oldFolder) {
+      if (oldFolder.timeStamp == timeStamp) {
+        int folderIndex = folderController.folders.indexOf(oldFolder);
+        oldFolder.files.forEach((file) {
+          if (file.fileUrl == fileUrl) {
+            folderController.folders[folderIndex].files.remove(file);
           }
         });
       }
@@ -92,51 +118,47 @@ class LogicHandler {
         String img64 = base64Encode(bytes);
         return img64;
       } else {
-        showDialog(
-          context: context,
-          builder: (con) => AlertDialog(
-            title: Text("Failed to load Image"),
-            content: Text("Couldn't load selected Image. Please try again"),
-            actions: [
-              FlatButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text("Ok"),
-              ),
-            ],
-          ),
+        _customDialog.showOkDialoge(
+          context,
+          "Failed to load Image",
+          "Couldn't load selected Image. Please try again",
         );
       }
     } else {
-      showDialog(
-        context: context,
-        builder: (con) => AlertDialog(
-          title: Text("Permission Error"),
-          content:
-              Text("In order to add a Picture, storage permissions is needed."),
-          actions: [
-            FlatButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text("Ok"),
-            ),
-          ],
-        ),
-      );
+      _customDialog.showOkDialoge(context, "Permission Error",
+          "In order to add a Picture, storage permissions is needed");
     }
 
     return "";
   }
 
-  static sendMail(String fileUrl) async {
-    String url = 'mailto:?subject=lost url&body=' + fileUrl;
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
+  static sendEmailWithAttachments(List<CustomFile> fileAttachments) {
+    List<String> attachmentPaths = new List<String>();
+    String body = "";
+
+    fileAttachments.forEach((f) {
+      attachmentPaths.add(f.filePath);
+      body = body + f.fileUrl + "\n";
+    });
+
+    sendMail(attachmentPaths: attachmentPaths, body: body);
+  }
+
+  static sendMail(
+      {String body = "",
+      String subject = "",
+      List<String> attachmentPaths = const []}) async {
+    final Email email = Email(
+      body: body,
+      subject: subject,
+      recipients: [],
+      cc: [],
+      bcc: [],
+      attachmentPaths: attachmentPaths,
+      isHTML: false,
+    );
+
+    await FlutterEmailSender.send(email);
   }
 
   static Future<bool> checkStoragePermissions() async {
@@ -180,25 +202,16 @@ class LogicHandler {
     }
   }
 
-  static Future<bool> downloadFile(Book book, BooksController controller,
-      String urlPath, String fileName, bool isGoogleDrive) async {
+  static Future<bool> downloadFile(
+      Folder folder,
+      FolderController controller,
+      String urlPath,
+      String fileName,
+      bool isGoogleDrive,
+      BuildContext context) async {
     if (await checkIfFileExists(fileName)) {
-      showDialog(
-        context: scaffoldKey.currentContext,
-        builder: (con) => AlertDialog(
-          title: Text("File Name already exists."),
-          content: Text(
-              "Please try another Name. You can also for example add a number at the End. (File Name 1)"),
-          actions: [
-            FlatButton(
-              onPressed: () {
-                Navigator.of(scaffoldKey.currentContext).pop();
-              },
-              child: Text("Ok"),
-            ),
-          ],
-        ),
-      );
+      _customDialog.showOkDialoge(context, "File Name already exists.",
+          "Please try another Name. You can also for example add a number at the End. (File Name 1)");
       return false;
     }
     String fieldID = "";
@@ -211,70 +224,47 @@ class LogicHandler {
             "&export=download";
       } else {
         if (!urlPath.contains(".pdf")) {
-          showDialog(
-            context: scaffoldKey.currentContext,
-            builder: (con) => AlertDialog(
-              title: Text("Wrong URL format!"),
-              content: Text(
-                  "The given Url has to be as shown in the example. 'YOURFieldID' is a random String. Something like that: '1KnDlG2RrQAgG0VvYpfUJLkS9ee6y'."),
-              actions: [
-                FlatButton(
-                  onPressed: () {
-                    Navigator.of(scaffoldKey.currentContext).pop();
-                  },
-                  child: Text("Ok"),
-                ),
-              ],
-            ),
-          );
+          _customDialog.showOkDialoge(context, "Wrong URL format!",
+              "The given Url has to be as shown in the example. 'YOURFieldID' is a random String. Something like that: '1KnDlG2RrQAgG0VvYpfUJLkS9ee6y'.");
           return false;
         }
       }
     } else {
       if (!urlPath.contains(".pdf")) {
-        showDialog(
-          context: scaffoldKey.currentContext,
-          builder: (con) => AlertDialog(
-            title: Text("Invalid File Type"),
-            content: Text(
-                "The file has to be a PDF File. It is also Possible to download from Google Drive, but please follow the Example."),
-            actions: [
-              FlatButton(
-                onPressed: () {
-                  Navigator.of(scaffoldKey.currentContext).pop();
-                },
-                child: Text("Ok"),
-              ),
-            ],
-          ),
-        );
+        _customDialog.showOkDialoge(context, "Invalid File Type",
+            "The file has to be a PDF File. It is also Possible to download from Google Drive, but please follow the Example.");
         return false;
       }
     }
 
     ProgressHud.showLoading();
     String dirPath = await getPath();
-
-    final response = await http.get(Uri.parse(urlPath));
-    writeCounter(response.bodyBytes, fileName);
+    try {
+      final response = await http.get(Uri.parse(urlPath));
+      writeCounter(response.bodyBytes, fileName);
+    } catch (e) {
+      sendMail(body: e.toString());
+    }
 
     print('$dirPath/$fileName');
+    String filePath = dirPath + "/" + fileName;
     String timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
-    Chapter newChapter = new Chapter(
+    CustomFile newFile = new CustomFile(
         timeStamp: timeStamp,
         completed: false,
         fileName: fileName,
         fileUrl: urlPath,
-        currentPage: 0);
+        currentPage: 0,
+        filePath: filePath);
 
-    controller.books
+    controller.folders
         .firstWhere(
-          (bk) => bk.name == book.name,
+          (bk) => bk.name == folder.name,
         )
         .files
-        .add(newChapter);
+        .add(newFile);
 
-    updateBook(book);
+    updateFolder(folder);
     ProgressHud.dismiss();
 
     return true;
