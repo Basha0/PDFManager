@@ -8,7 +8,7 @@
 - Add Permission handling iOS.
 - Add Connection hadnling.(What happens if no internet connection)
 
-Change the PDF Reader plugin.
+- Change the PDF Reader plugin.
 
 # Main Plugins I am using
 - "hive" for the local Database: https://pub.dev/packages/hive
