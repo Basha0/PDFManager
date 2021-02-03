@@ -1,12 +1,12 @@
 # pdfmanager
 
-For now only tested/working on Android. 
-For iOS I have to change the storage handling and also add Permission options in info.plist etc. 
+- For now only tested/working on Android. 
+- For iOS I have to change the storage handling and also add Permission options in info.plist etc. 
 
 # TODO
-Add storage handling for iOS.
-Add Permission handling iOS.
-Add Connection hadnling.(What happens if no internet connection)
+- Add storage handling for iOS.
+- Add Permission handling iOS.
+- Add Connection hadnling.(What happens if no internet connection)
 
 Change the PDF Reader plugin.
 
