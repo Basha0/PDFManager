@@ -1,10 +1,20 @@
 # pdfmanager
 
-For now only tested on Android. For iOS is have to change the storage handling.
+For now only tested/working on Android. 
+For iOS I have to change the storage handling and also add Permission options in info.plist etc. 
 
 # TODO
-
+Add storage handling for iOS.
+Add Permission handling iOS.
 Add Connection hadnling.(What happens if no internet connection)
+
+Change the PDF Reader plugin.
+
+# Main Plugins I am using
+- "hive" for the local Database: https://pub.dev/packages/hive
+- "GetX" for State Managment: https://pub.dev/packages/get
+- "permission_handler" for Permission handling: https://pub.dev/packages/permission_handler
+- "flutter_pdfview" for being able to open PDF files in the App: https://pub.dev/packages/flutter_pdfview (Will change that, as the pdf_reader is very basic)
 
 
 # Why i created this project
