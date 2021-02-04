@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pdfmanager/controllers/folder_controller.dart';
 import 'package:pdfmanager/logic/logic.dart';
+import 'package:pdfmanager/resources.dart/Strings.dart';
 import 'package:pdfmanager/screens/files_list_view/file_view.dart';
 
 class LibraryScreen extends StatelessWidget {
@@ -16,7 +17,7 @@ class LibraryScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Library"),
+        title: Text(Strings.library),
         actions: <Widget>[],
       ),
       body: Stack(
@@ -35,7 +36,8 @@ class LibraryScreen extends StatelessWidget {
                     var _byteImage;
                     bool imageAvaible = false;
                     if (folderController.folders[index].imageStr != null) {
-                      String base64Image = folderController.folders[index].imageStr;
+                      String base64Image =
+                          folderController.folders[index].imageStr;
                       print(folderController.folders[index].imageStr);
                       _byteImage = Base64Decoder().convert(base64Image);
                       imageAvaible = true;
@@ -46,7 +48,8 @@ class LibraryScreen extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => FilesScreen(
-                                folderController.folders[index], folderController),
+                                folderController.folders[index],
+                                folderController),
                           ),
                         );
                       },
@@ -83,7 +86,7 @@ class LibraryScreen extends StatelessWidget {
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
                                 child: AutoSizeText(
-                                  controller.folders[index].name ?? "Error",
+                                  controller.folders[index].name ?? Strings.error,
                                   maxLines: 2,
                                   minFontSize: 11,
                                   maxFontSize: 20,
@@ -143,7 +146,7 @@ class LibraryScreen extends StatelessWidget {
       child: Column(
         children: <Widget>[
           SizedBox(height: 12),
-          Text('Create new folder',
+          Text(Strings.createNewFolder,
               style: Theme.of(context).textTheme.headline1),
           Container(height: 2, color: Colors.white),
           SizedBox(height: 12),
@@ -161,7 +164,7 @@ class LibraryScreen extends StatelessWidget {
                     borderSide: const BorderSide(color: Colors.red, width: 2.0),
                   ),
                   labelStyle: new TextStyle(color: Colors.white),
-                  labelText: 'Folder Name',
+                  labelText: Strings.folderName,
                 ),
               ),
               SizedBox(
@@ -170,7 +173,7 @@ class LibraryScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Add Image (Optional)"),
+                  Text(Strings.addImage),
                   RaisedButton(
                     color: Colors.red,
                     onPressed: () {
@@ -189,7 +192,7 @@ class LibraryScreen extends StatelessWidget {
                   RaisedButton(
                     color: Colors.red,
                     child: Text(
-                      "Cancel",
+                      Strings.cancel,
                       style: TextStyle(color: Colors.white, fontSize: 14),
                     ),
                     onPressed: () {
@@ -199,7 +202,7 @@ class LibraryScreen extends StatelessWidget {
                   RaisedButton(
                     color: Colors.red,
                     child: Text(
-                      "Create",
+                      Strings.create,
                       style: TextStyle(color: Colors.white, fontSize: 14),
                     ),
                     onPressed: () {
@@ -211,16 +214,14 @@ class LibraryScreen extends StatelessWidget {
                         showDialog(
                           context: context,
                           builder: (con) => AlertDialog(
-                            title: Text("Folder Name Empty"),
-                            content:
-                                Text("Please add a folder name."),
+                            title: Text(Strings.folderNameEmpty),
+                            content: Text(Strings.addFolderNameMessage),
                             actions: [
                               FlatButton(
                                 onPressed: () {
-                                  Navigator.of(context)
-                                      .pop();
+                                  Navigator.of(context).pop();
                                 },
-                                child: Text("Ok"),
+                                child: Text(Strings.ok),
                               ),
                             ],
                           ),

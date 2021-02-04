@@ -4,6 +4,7 @@ import 'package:pdfmanager/controllers/folder_controller.dart';
 import 'package:pdfmanager/db_models/folder.dart';
 import 'package:pdfmanager/logic/dialog.dart';
 import 'package:pdfmanager/logic/logic.dart';
+import 'package:pdfmanager/resources.dart/Strings.dart';
 
 class AddFileDialoge extends StatefulWidget {
   final Folder folder;
@@ -20,8 +21,7 @@ class _AddFileDialogeState extends State<AddFileDialoge> {
   String _fileURL;
   String _fileName;
   bool _isGoogleDrive = false;
-  String googleDriveUrlExample =
-      "Example: https://drive.google.com/file/d/YOURFieldID/view";
+  String googleDriveUrlExample = Strings.googleDriveUrlExample;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,7 @@ class _AddFileDialogeState extends State<AddFileDialoge> {
       child: Column(
         children: <Widget>[
           SizedBox(height: 12),
-          Text('Download file from URL.',
+          Text(Strings.downloadFileFromUrl,
               style: Theme.of(context).textTheme.headline1),
           Container(height: 2, color: Colors.white),
           SizedBox(height: 12),
@@ -49,10 +49,10 @@ class _AddFileDialogeState extends State<AddFileDialoge> {
                   ),
                   hintText: _isGoogleDrive
                       ? googleDriveUrlExample
-                      : "Example: https://MyWebsite.com/file.pdf",
+                      : Strings.pdfUrlExample,
                   hintStyle: TextStyle(fontSize: 8),
                   labelStyle: new TextStyle(color: Colors.white),
-                  labelText: 'Url',
+                  labelText: Strings.url,
                 ),
               ),
               Row(
@@ -68,7 +68,7 @@ class _AddFileDialogeState extends State<AddFileDialoge> {
                       });
                     },
                   ),
-                  Text("Check if URL is Google Drive Url")
+                  Text(Strings.checkIfUrlIsGoogleDriveUrl)
                 ],
               ),
               TextField(
@@ -80,9 +80,9 @@ class _AddFileDialogeState extends State<AddFileDialoge> {
                   focusedBorder: OutlineInputBorder(
                     borderSide: const BorderSide(color: Colors.red, width: 2.0),
                   ),
-                  hintText: "File name 12",
+                  hintText: Strings.fileNameHint2,
                   labelStyle: new TextStyle(color: Colors.white),
-                  labelText: 'File Name',
+                  labelText: Strings.fileNameHint,
                 ),
               ),
               SizedBox(height: 15),
@@ -92,7 +92,7 @@ class _AddFileDialogeState extends State<AddFileDialoge> {
                   RaisedButton(
                     color: Colors.red,
                     child: Text(
-                      "Cancel",
+                      Strings.cancel,
                       style: TextStyle(color: Colors.white, fontSize: 14),
                     ),
                     onPressed: () {
@@ -102,15 +102,17 @@ class _AddFileDialogeState extends State<AddFileDialoge> {
                   RaisedButton(
                     color: Colors.red,
                     child: Text(
-                      "Download",
+                      Strings.download,
                       style: TextStyle(color: Colors.white, fontSize: 14),
                     ),
                     onPressed: () {
                       if (_fileName != null && _fileName.isNotEmpty) {
                         downloadFile(context);
                       } else {
-                        _customDialog.showOkDialoge(context, "File Name Empty",
-                            "Please add a file name.");
+                        _customDialog.showOkDialoge(
+                            context,
+                            Strings.fileNameEmpty,
+                            Strings.fileNameEmptyMessage);
                       }
                     },
                   ),
@@ -138,8 +140,8 @@ class _AddFileDialogeState extends State<AddFileDialoge> {
         Navigator.pop(context);
       }
     } else {
-      _customDialog.showOkDialoge(context, "Permission Error",
-          "In order to add a Picture, storage permissions is needed.");
+      _customDialog.showOkDialoge(
+          context, Strings.permissionError, Strings.storagePermissionMessage);
     }
   }
 }

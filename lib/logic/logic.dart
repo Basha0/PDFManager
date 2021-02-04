@@ -13,6 +13,7 @@ import 'package:pdfmanager/controllers/folder_controller.dart';
 import 'package:pdfmanager/database/hive_database_service.dart';
 import 'package:pdfmanager/db_models/folder.dart';
 import 'package:pdfmanager/db_models/file.dart';
+import 'package:pdfmanager/resources.dart/Strings.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'dialog.dart';
@@ -120,13 +121,13 @@ class LogicHandler {
       } else {
         _customDialog.showOkDialoge(
           context,
-          "Failed to load Image",
-          "Couldn't load selected Image. Please try again",
+          Strings.failedToLoadImage,
+          Strings.failedToLoadImageMessage,
         );
       }
     } else {
-      _customDialog.showOkDialoge(context, "Permission Error",
-          "In order to add a Picture, storage permissions is needed");
+      _customDialog.showOkDialoge(
+          context, Strings.permissionError, Strings.storagePermissionMessage);
     }
 
     return "";
@@ -181,7 +182,7 @@ class LogicHandler {
       await Permission.storage.request();
       var status = await Permission.storage.status;
       if (status.isGranted) {
-        String name = await getPath();
+        String name = await getDownloadFolderPath();
         final script = new io.File(name);
         final fileByte = await script.readAsBytes();
         io.File file = await writeCounter(fileByte, fileName);
@@ -192,13 +193,13 @@ class LogicHandler {
           return pdfPath;
         } else {
           print("no it doesn't");
-          return "cancle";
+          return Strings.cancel;
         }
       } else {
-        return "cancle";
+        return Strings.cancel;
       }
     } else {
-      return "cancle";
+      return Strings.cancel;
     }
   }
 
@@ -210,8 +211,8 @@ class LogicHandler {
       bool isGoogleDrive,
       BuildContext context) async {
     if (await checkIfFileExists(fileName)) {
-      _customDialog.showOkDialoge(context, "File Name already exists.",
-          "Please try another Name. You can also for example add a number at the End. (File Name 1)");
+      _customDialog.showOkDialoge(context, Strings.fileNameAllreadyExists,
+          Strings.fileNameAllreadyExistsMessage);
       return false;
     }
     String fieldID = "";
@@ -223,22 +224,22 @@ class LogicHandler {
             fieldID +
             "&export=download";
       } else {
-        if (!urlPath.contains(".pdf")) {
-          _customDialog.showOkDialoge(context, "Wrong URL format!",
-              "The given Url has to be as shown in the example. 'YOURFieldID' is a random String. Something like that: '1KnDlG2RrQAgG0VvYpfUJLkS9ee6y'.");
+        if (!urlPath.contains(Strings.pdfType)) {
+          _customDialog.showOkDialoge(
+              context, Strings.wrongURLFormat, Strings.wrongURLFormatMessage);
           return false;
         }
       }
     } else {
-      if (!urlPath.contains(".pdf")) {
-        _customDialog.showOkDialoge(context, "Invalid File Type",
-            "The file has to be a PDF File. It is also Possible to download from Google Drive, but please follow the Example.");
+      if (!urlPath.contains(Strings.pdfType)) {
+        _customDialog.showOkDialoge(
+            context, Strings.invalidFileType, Strings.invalidFileTypeMessage);
         return false;
       }
     }
 
     ProgressHud.showLoading();
-    String dirPath = await getPath();
+    String dirPath = await getDownloadFolderPath();
     try {
       final response = await http.get(Uri.parse(urlPath));
       writeCounter(response.bodyBytes, fileName);
@@ -284,14 +285,14 @@ class LogicHandler {
     return file.writeAsBytes(stream);
   }
 
-  static Future<String> getPath() async {
+  static Future<String> getDownloadFolderPath() async {
     return (await ExtStorage.getExternalStoragePublicDirectory(
         ExtStorage.DIRECTORY_DOWNLOADS));
   }
 
   static Future<bool> checkIfFileExists(String fileName) async {
-    String dirPath = await getPath();
-    if (io.File('$dirPath/$fileName').existsSync()) {
+    io.File file = await getFilePath(fileName);
+    if (file.existsSync()) {
       return true;
     }
     return false;

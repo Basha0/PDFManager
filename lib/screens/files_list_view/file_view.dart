@@ -7,6 +7,7 @@ import 'package:pdfmanager/db_models/file.dart';
 import 'package:pdfmanager/db_models/folder.dart';
 import 'package:pdfmanager/logic/dialog.dart';
 import 'package:pdfmanager/logic/logic.dart';
+import 'package:pdfmanager/resources.dart/Strings.dart';
 import 'package:pdfmanager/screens/files_list_view/widgets/add_file_widget.dart';
 import 'package:pdfmanager/screens/pdfreader_screen/pdf_reader_view.dart';
 
@@ -42,20 +43,19 @@ class _FilesScreenState extends State<FilesScreen> {
 
   handleClick(String value) {
     switch (value) {
-      case "Remove all":
+      case Strings.removeAll:
         showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text("Delete Files"),
-              content: Text(
-                  "Are you sure you want to delete all File in this folder?"),
+              title: Text(Strings.deleteFiles),
+              content: Text(Strings.deleteAllFilesMessage),
               actions: [
                 FlatButton(
                   onPressed: () {
                     Navigator.of(scaffoldKey.currentContext).pop();
                   },
-                  child: Text("Cancel"),
+                  child: Text(Strings.cancel),
                 ),
                 FlatButton(
                   onPressed: () {
@@ -64,7 +64,7 @@ class _FilesScreenState extends State<FilesScreen> {
                     refresh();
                     Navigator.of(scaffoldKey.currentContext).pop();
                   },
-                  child: Text("Delete"),
+                  child: Text(Strings.delete),
                 ),
               ],
             );
@@ -75,6 +75,9 @@ class _FilesScreenState extends State<FilesScreen> {
         if (selectedItems.isNotEmpty) {
           LogicHandler.sendEmailWithAttachments(selectedItems);
           selectedItems.clear();
+        } else {
+          _customDialog.showOkDialoge(
+              context, Strings.noItemsSelected, Strings.noItemsSelectedMessage);
         }
     }
   }
@@ -84,13 +87,14 @@ class _FilesScreenState extends State<FilesScreen> {
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
-        title: Text("File List"),
+        title: Text(Strings.fileList),
         centerTitle: true,
         actions: [
           PopupMenuButton<String>(
             onSelected: handleClick,
             itemBuilder: (BuildContext context) {
-              return {'Remove all', 'Share selected'}.map((String choice) {
+              return {Strings.removeAll, Strings.shareSelected}
+                  .map((String choice) {
                 return PopupMenuItem<String>(
                   value: choice,
                   child: Text(choice),
@@ -143,17 +147,17 @@ class _FilesScreenState extends State<FilesScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: 8),
-                      Text("Title: " + widget.folder.name,
+                      Text(Strings.titleSpace + widget.folder.name,
                           style: TextStyle(fontSize: 24)),
                       SizedBox(height: 8),
                       Text(
-                          "Added: " +
+                          Strings.addedSpace +
                               LogicHandler.convertTimpeStampToDate(
                                   widget.folder.timeStamp),
                           style: TextStyle(fontSize: 20)),
                       SizedBox(height: 8),
                       Text(
-                          "Files Count: " +
+                          Strings.filesCountSpace +
                               widget.folder.files.length.toString(),
                           style: TextStyle(fontSize: 18)),
                     ],
@@ -203,7 +207,7 @@ class _FilesScreenState extends State<FilesScreen> {
                                 ),
                                 SizedBox(height: 5),
                                 Text(
-                                    "Current Page: " +
+                                    Strings.currentPageSpace +
                                         widget.folder.files[index].currentPage
                                             .toString(),
                                     style: TextStyle(fontSize: 10))
@@ -219,9 +223,8 @@ class _FilesScreenState extends State<FilesScreen> {
                                 context: context,
                                 builder: (context) {
                                   return AlertDialog(
-                                    title: Text("Delete File"),
-                                    content: Text(
-                                        "Are you sure you want to delete this File?"),
+                                    title: Text(Strings.deleteFile),
+                                    content: Text(Strings.deleteFileMessage),
                                     actions: [
                                       FlatButton(
                                         onPressed: () {
@@ -229,7 +232,7 @@ class _FilesScreenState extends State<FilesScreen> {
                                                   scaffoldKey.currentContext)
                                               .pop();
                                         },
-                                        child: Text("Cancel"),
+                                        child: Text(Strings.cancel),
                                       ),
                                       FlatButton(
                                         onPressed: () {
@@ -245,7 +248,7 @@ class _FilesScreenState extends State<FilesScreen> {
                                                   scaffoldKey.currentContext)
                                               .pop();
                                         },
-                                        child: Text("Delete"),
+                                        child: Text(Strings.delete),
                                       ),
                                     ],
                                   );
@@ -316,8 +319,8 @@ class _FilesScreenState extends State<FilesScreen> {
         showFileLostDialog(index);
       }
     } else {
-      _customDialog.showOkDialoge(context, "Permission Error",
-          "In order to add a Picture, storage permissions is needed.");
+      _customDialog.showOkDialoge(
+          context, Strings.permissionError, Strings.storagePermissionMessage);
     }
   }
 
@@ -333,9 +336,8 @@ class _FilesScreenState extends State<FilesScreen> {
           height: 300,
           width: MediaQuery.of(context).size.width - 100,
           child: AlertDialog(
-            title: Text("File not found"),
-            content: Text(
-                "File was not found. Either it was deleted or moved. File will now not be shown anymore. If you want to have the URL we can send it via mail."),
+            title: Text(Strings.fileNotFound),
+            content: Text(Strings.fileNotFoundMessage),
             actions: [
               FlatButton(
                 onPressed: () {
@@ -346,7 +348,7 @@ class _FilesScreenState extends State<FilesScreen> {
                   refresh();
                   Navigator.pop(context);
                 },
-                child: Text("Ok"),
+                child: Text(Strings.ok),
               ),
               FlatButton(
                 onPressed: () {
@@ -359,7 +361,7 @@ class _FilesScreenState extends State<FilesScreen> {
                   refresh();
                   Navigator.pop(context);
                 },
-                child: Text("Send Mail"),
+                child: Text(Strings.sendEmail),
               ),
             ],
           ),
