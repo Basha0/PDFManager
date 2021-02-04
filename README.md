@@ -1,7 +1,7 @@
 # pdfmanager
 
 - For now only tested/working on Android. 
-- For iOS I have to change the storage handling and also add Permission options in info.plist etc. 
+- For iOS I have to change the storage handling and also add Permission options in info.plist etc. I cant do that yet as i dont have an private Mac to build the code. Will need to run an VM or maybe buy a Mac :D
 
 # TODO
 - Add storage handling for iOS.
