@@ -45,7 +45,7 @@ class LogicHandler {
     deleteFile(folder.timeStamp, fileUrl, folderController);
 
     try {
-      io.File file = await getFilePath(fileName);
+      io.File file = await getFilePath(fileName  + Strings.pdfType);
 
       if (await file.exists()) {
         await file.delete();
@@ -66,7 +66,7 @@ class LogicHandler {
 
         files.forEach((f) async {
           try {
-            io.File file = await getFilePath(f.fileName);
+            io.File file = await getFilePath(f.fileName + Strings.pdfType);
 
             if (await file.exists()) {
               await file.delete();
@@ -176,7 +176,7 @@ class LogicHandler {
   }
 
   static Future<String> loadLocalFile(String fileName) async {
-    var fileExists = await checkIfFileExists(fileName);
+    var fileExists = await checkIfFileExists(fileName  + Strings.pdfType);
     if (fileExists) {
       String pdfPath = "";
       await Permission.storage.request();
@@ -185,7 +185,7 @@ class LogicHandler {
         String name = await getDownloadFolderPath();
         final script = new io.File(name);
         final fileByte = await script.readAsBytes();
-        io.File file = await writeCounter(fileByte, fileName);
+        io.File file = await writeCounter(fileByte, fileName  + Strings.pdfType);
         print("load: " + fileName);
         if (await file.exists()) {
           print("yes it does");
@@ -210,7 +210,7 @@ class LogicHandler {
       String fileName,
       bool isGoogleDrive,
       BuildContext context) async {
-    if (await checkIfFileExists(fileName)) {
+    if (await checkIfFileExists(fileName + Strings.pdfType)) {
       _customDialog.showOkDialoge(context, Strings.fileNameAllreadyExists,
           Strings.fileNameAllreadyExistsMessage);
       return false;
@@ -242,13 +242,13 @@ class LogicHandler {
     String dirPath = await getDownloadFolderPath();
     try {
       final response = await http.get(Uri.parse(urlPath));
-      writeCounter(response.bodyBytes, fileName);
+      writeCounter(response.bodyBytes, fileName + Strings.pdfType);
     } catch (e) {
       sendMail(body: e.toString());
     }
 
     print('$dirPath/$fileName');
-    String filePath = dirPath + "/" + fileName;
+    String filePath = dirPath + "/" + fileName + Strings.pdfType;
     String timeStamp = DateTime.now().millisecondsSinceEpoch.toString();
     CustomFile newFile = new CustomFile(
         timeStamp: timeStamp,

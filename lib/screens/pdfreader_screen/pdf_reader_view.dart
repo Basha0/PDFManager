@@ -36,7 +36,7 @@ class _PDFReaderViewState extends State<PDFReaderView> {
   }
 
   void loadFile() async {
-    File file = await LogicHandler.getFilePath(widget.fileName);
+    File file = await LogicHandler.getFilePath(widget.fileName + Strings.pdfType);
     setState(() {
       pdfPath = file.path;
 

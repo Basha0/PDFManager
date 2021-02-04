@@ -302,7 +302,7 @@ class _FilesScreenState extends State<FilesScreen> {
     var permissionGranted = await LogicHandler.checkStoragePermissions();
     if (permissionGranted) {
       bool exists = await LogicHandler.checkIfFileExists(
-          widget.folder.files[index].fileName);
+          widget.folder.files[index].fileName + Strings.pdfType);
       if (exists) {
         Navigator.push(
           context,
