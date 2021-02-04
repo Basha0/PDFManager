@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pdfmanager/resources.dart/Strings.dart';
 
 class CustomDiaglog {
    static final CustomDiaglog _singleton = new CustomDiaglog._internal();
@@ -17,7 +18,7 @@ class CustomDiaglog {
             onPressed: () {
               Navigator.pop(context);
             },
-            child: Text("Ok"),
+            child: Text(Strings.ok),
           ),
         ],
       ),

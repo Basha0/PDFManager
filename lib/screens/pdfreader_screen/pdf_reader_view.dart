@@ -6,6 +6,7 @@ import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:pdfmanager/controllers/folder_controller.dart';
 import 'package:pdfmanager/db_models/folder.dart';
 import 'package:pdfmanager/logic/logic.dart';
+import 'package:pdfmanager/resources.dart/Strings.dart';
 
 class PDFReaderView extends StatefulWidget {
   final String fileName;
@@ -48,7 +49,7 @@ class _PDFReaderViewState extends State<PDFReaderView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("PDF Reader"),
+        title: Text(Strings.pdfReader),
         centerTitle: true,
       ),
       body: Center(
