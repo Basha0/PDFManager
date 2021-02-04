@@ -3,6 +3,10 @@
 - For now only tested/working on Android. 
 - For iOS I have to change the storage handling and also add Permission options in info.plist etc. I cant do that yet as i dont have an private Mac to build the code. Will need to run an VM or maybe buy a Mac :D
 
+# IMPORTANT
+The google drive url has to be something like this : "https://drive.google.com/file/d/(FielID)/view"
+example https://drive.google.com/file/d/1KnDle2RrQAIV0VvYpfUJLkgJEH9Kme6y/view
+
 # TODO
 - Add storage handling for iOS.
 - Add Permission handling iOS.
